@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "harness_version": "3.0.0",
+  "source": "05 Harness-codex v2",
+  "required_roles": [
+    "analyzer-a",
+    "analyzer-b",
+    "analyzer-c",
+    "builder-d1",
+    "builder-d2",
+    "builder-d3",
+    "builder-d4"
+  ],
+  "required_modes": [
+    "one_shot_build",
+    "qa_fix",
+    "commit_release_prepare",
+    "fds_as_built",
+    "dq_ioq_rtm_drafts"
+  ],
+  "intents": [
+    {"id":"V2-01","name":"URS Section 2, 6, 7.1 driven generic build","evidence_files":["AGENTS.md","harness/WORKFLOW.md"]},
+    {"id":"V2-02","name":"Three GMP training system families","evidence_files":["AGENTS.md","README.md"]},
+    {"id":"V2-03","name":"Next.js TypeScript Tailwind Google Sheets Vercel stack","evidence_files":["AGENTS.md","package.json","lib/sheets.ts"]},
+    {"id":"V2-04","name":"KPBMA CI and portal design system","evidence_files":["design.md","components/ui.tsx","public/kpbma-ci.png","public/kpbma-ci-white.png"]},
+    {"id":"V2-05","name":"Defensive table overflow and detail modal design","evidence_files":["design.md","components/ui.tsx","harness/QUALITY_GATES.md"]},
+    {"id":"V2-06","name":"URS roles accounts menus and permissions","evidence_files":["AGENTS.md","agents/analyzer-a.md","agents/builder-d1.md"]},
+    {"id":"V2-07","name":"Initial password 1234 and required login field order","evidence_files":["AGENTS.md","app/login/LoginForm.tsx","lib/brand.ts"]},
+    {"id":"V2-08","name":"Fixed CSV training system title format","evidence_files":["AGENTS.md","lib/brand.ts"]},
+    {"id":"V2-09","name":"All functional clauses targeted with explicit gaps","evidence_files":["AGENTS.md","harness/QUALITY_GATES.md","scripts/check-harness.mjs","scripts/test-harness-parser.mjs","scripts/test-harness-gate.mjs"]},
+    {"id":"V2-10","name":"Sixty minute one shot course target","evidence_files":["AGENTS.md","harness/WORKFLOW.md"]},
+    {"id":"V2-11","name":"Three analyzer and four builder role decomposition","evidence_files":[".codex/config.toml",".codex/agents/analyzer-a.toml",".codex/agents/builder-d4.toml","harness/ORCHESTRATION.md","agents/analyzer-a.md","agents/builder-d4.md"]},
+    {"id":"V2-12","name":"No early subagent collection and sequential fallback","evidence_files":[".codex/config.toml","AGENTS.md","harness/ORCHESTRATION.md","harness/SUBAGENT_CONTRACT.md"]},
+    {"id":"V2-13","name":"LF and UTF-8 editing resilience","evidence_files":[".gitattributes",".editorconfig","AGENTS.md"]},
+    {"id":"V2-14","name":"Immutable Sheets adapter with checksum restoration","evidence_files":["docs/SHEETS_SPEC.md","scripts/check-sheets.mjs"]},
+    {"id":"V2-15","name":"Server side authorization calculation blocking workflow and audit","evidence_files":["AGENTS.md","agents/builder-d1.md","agents/builder-d2.md","agents/builder-d3.md","agents/builder-d4.md"]},
+    {"id":"V2-16","name":"Korean reporting terminology and clause traceability","evidence_files":["AGENTS.md","harness/OUTPUT_CONTRACTS.md"]},
+    {"id":"V2-17","name":"QA correction loop and changelog","evidence_files":["AGENTS.md","harness/WORKFLOW.md"]},
+    {"id":"V2-18","name":"As built FDS with fixed structure and Word generation","evidence_files":["docs/FDS_GUIDE.md","docs/FDS_TEMPLATE.md","scripts/build-fds.mjs"]},
+    {"id":"V2-19","name":"DQ IOQ RTM draft support","evidence_files":["docs/DRAFTS.md","docs/GUIDE_실습흐름_URS에서VSR까지.md"]},
+    {"id":"V2-20","name":"Human controlled push deployment and v1.0 IOQ boundary","evidence_files":["AGENTS.md","docs/RUNBOOK_당일운영.md"]},
+    {"id":"V2-21","name":"Secret and commit scope checks","evidence_files":[".gitignore","scripts/check-commit.mjs"]},
+    {"id":"V2-22","name":"Template cloning without secrets URS or prior outputs","evidence_files":["scripts/new-project.mjs"]},
+    {"id":"V2-23","name":"Instructor setup and day of course runbook","evidence_files":["docs/SETUP_강사용.md","docs/RUNBOOK_당일운영.md"]},
+    {"id":"V2-24","name":"Implementation validation and environment validation reported separately","evidence_files":["AGENTS.md","harness/QUALITY_GATES.md","harness/OUTPUT_CONTRACTS.md"]},
+    {"id":"V3-01","name":"Explicit model and reasoning routing without Luna","evidence_files":[".codex/config.toml",".codex/agents/analyzer-a.toml",".codex/agents/builder-d1.toml","AGENTS.md","harness/ORCHESTRATION.md","scripts/check-harness.mjs"]}
+  ]
+}

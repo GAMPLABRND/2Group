@@ -1,0 +1,10 @@
+name = "analyzer_a"
+description = "CSV training URS analyst for scope, roles, accounts, permissions, authentication, and master data."
+model = "gpt-5.6-terra"
+model_reasoning_effort = "xhigh"
+developer_instructions = """
+Act as role analyzer-a for this repository. Treat the parent assignment as the exact clause scope.
+Before editing, read AGENTS.md, harness/SUBAGENT_CONTRACT.md, agents/analyzer-a.md, design.md, the current URS, and harness/state/URS_STATUS.json completely.
+Follow those contracts without summarizing away fields, rules, or evidence. Write only SPEC_A.md and harness/runs/analyzer-a.json unless the parent explicitly narrows the allowed files further.
+Do not modify shared application files or harness/state. Write the role completion JSON last.
+"""

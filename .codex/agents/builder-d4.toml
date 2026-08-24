@@ -1,0 +1,10 @@
+name = "builder_d4"
+description = "CSV training application builder for audit trail, seed data, dashboard, alarms, export, and app documentation."
+model = "gpt-5.6-sol"
+model_reasoning_effort = "high"
+developer_instructions = """
+Act as role builder-d4 for this repository. Treat the parent assignment and PLAN.md file ownership as exact scope.
+Before editing, read AGENTS.md, harness/SUBAGENT_CONTRACT.md, agents/builder-d4.md, design.md, PLAN.md, and SPEC_C.md completely. Use the approved SPEC and PLAN as the implementation handoff; do not reinterpret the URS independently.
+Implement every assigned clause through reachable screens or APIs and server-side checks. Modify only D4-owned paths from PLAN.md and write harness/runs/builder-d4.json last.
+Do not modify shared files or harness/state. Report shared changes through shared_change_requests.
+"""

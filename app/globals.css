@@ -1,0 +1,153 @@
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css");
+@import "tailwindcss";
+
+/*
+  KPBMA 교육 시스템 디자인 토큰 (design.md 4절과 1:1 대응).
+  Tailwind v4 @theme 으로 등록되어 bg-primary, text-ink-muted, border-line, rounded-card, shadow-card 같은
+  유틸리티 클래스로 쓴다. 값을 바꾸려면 design.md 를 먼저 고친다. 공유 파일이므로 오케스트레이터만 수정한다.
+*/
+@theme {
+  --font-sans: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Noto Sans KR", sans-serif;
+
+  --color-primary: #0072CE;        /* 주 버튼, 링크, 활성 탭, 강조 */
+  --color-primary-dark: #163A5F;   /* 상단바, 제목, 네이비 배경 */
+  --color-primary-soft: #EAF5FF;   /* 안내 상자, 선택 항목 배경 */
+  --color-cyan: #00A6B2;           /* 보조 포인트, 아이콘 */
+  --color-muted: #F5F7FA;          /* 화면 바탕, 표 머리글 */
+  --color-line: #DDE3EA;           /* 테두리, 구분선 */
+  --color-ink: #1F2933;            /* 본문 글자 */
+  --color-ink-muted: #667085;      /* 설명, 메타 정보 */
+  --color-success: #12B76A;        /* 승인, 완료, 정상 */
+  --color-warning: #F79009;        /* 대기, 주의 */
+  --color-danger: #F04438;         /* 반려, 오류, 차단 */
+
+  --radius-card: 16px;
+  --radius-input: 8px;
+  --radius-pill: 50px;
+
+  --shadow-card: 0 1px 3px rgba(31, 41, 51, 0.08), 0 2px 8px rgba(31, 41, 51, 0.04);
+  --shadow-card-hover: 0 4px 16px rgba(22, 58, 95, 0.08), 0 2px 4px rgba(22, 58, 95, 0.04);
+  --shadow-modal: 0 20px 40px rgba(22, 58, 95, 0.15);
+}
+
+/* 셀 정렬 유틸리티 (design.md 6.2 열별 정렬 규격). components/ui.tsx 의 Td 와 doc-table 이 함께 쓴다 */
+/* nowrap 셀은 폭을 넘으면 말줄임한다. table-fixed 에서 overflow 를 두면 옆 열 글자와 겹친다 */
+.cell-nowrap { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cell-num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cell-code { font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cell-clamp-1 { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 1; overflow: hidden; overflow-wrap: anywhere; }
+.cell-clamp-2 { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; overflow-wrap: anywhere; }
+.cell-clamp-3 { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; overflow-wrap: anywhere; }
+
+/* 인쇄용 문서 표 (design.md 8절). 화면에서도 같은 모양으로 미리 보인다 */
+.doc-table { width: 100%; table-layout: fixed; border-collapse: collapse; border: 1.5px solid #000; background: #fff; color: #000; font-size: 12px; }
+.doc-table th, .doc-table td { border: 1px solid #000; padding: 4px 6px; vertical-align: top; word-break: break-word; line-height: 1.45; }
+.doc-table thead th { background: #F5F7FA; font-weight: 700; text-align: left; border-bottom: 1.5px solid #000; }
+.doc-table thead th.text-center { text-align: center; }
+.doc-table thead th.text-right { text-align: right; }
+
+/* 인쇄 전용 요소는 화면에서 숨긴다 */
+.print-only { display: none; }
+
+/* 바탕: 라이트 테마 고정 (다크 모드 미대응은 의도된 단순화) */
+body {
+  background: var(--color-muted);
+  color: var(--color-ink);
+  font-size: 15px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 {
+  color: var(--color-primary-dark);
+  font-weight: 700;
+}
+
+/* 로그인 화면 배경: 네이비 방사 그라데이션 위에 흐르는 블롭 (design.md 7절) */
+.aurora-bg {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, #163A5F 0%, #0d1e33 100%);
+  overflow: hidden;
+  z-index: 0;
+}
+.aurora-bg .blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.45;
+  mix-blend-mode: screen;
+}
+.aurora-bg .blob-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background: #0072CE; animation: floatBlob1 25s ease-in-out infinite alternate; }
+.aurora-bg .blob-2 { bottom: -10%; right: -10%; width: 60vw; height: 60vw; background: #00A6B2; animation: floatBlob2 30s ease-in-out infinite alternate; }
+.aurora-bg .blob-3 { top: 40%; left: 50%; width: 45vw; height: 45vw; background: #1a4975; animation: floatBlob3 22s ease-in-out infinite alternate; }
+.aurora-bg .blob-4 { bottom: 20%; left: 10%; width: 35vw; height: 35vw; background: #005bb2; animation: floatBlob4 28s ease-in-out infinite alternate; }
+@keyframes floatBlob1 { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(10vw, 15vh) scale(1.1); } 100% { transform: translate(-5vw, 5vh) scale(0.9); } }
+@keyframes floatBlob2 { 0% { transform: translate(0, 0) scale(1.1); } 50% { transform: translate(-15vw, -10vh) scale(0.95); } 100% { transform: translate(5vw, -5vh) scale(1.05); } }
+@keyframes floatBlob3 { 0% { transform: translate(0, 0) scale(0.9); } 50% { transform: translate(-10vw, 10vh) scale(1.15); } 100% { transform: translate(10vw, -10vh) scale(0.95); } }
+@keyframes floatBlob4 { 0% { transform: translate(0, 0) scale(1.05); } 50% { transform: translate(15vw, -15vh) scale(0.9); } 100% { transform: translate(-10vw, 10vh) scale(1.1); } }
+
+/* 인쇄: 상단바, 사이드 메뉴, 버튼은 숨기고 본문만 흰 바탕에 (design.md 8절) */
+@media print {
+  body { background: #FFFFFF !important; font-size: 11px; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .no-print { display: none !important; }
+  .print-only { display: block !important; }
+
+  /* 넓은 표를 담는 보고서는 최상위 인쇄 영역에 print-landscape 를 붙여 가로 방향으로 출력한다 (Chrome, Edge 지원) */
+  .print-landscape { page: landscape; }
+
+  /* 인쇄 영역과 본문 폭 제한 해제 */
+  .print-area { box-shadow: none !important; border: none !important; padding: 0 !important; max-width: none !important; }
+  main { overflow: visible !important; padding: 0 !important; }
+  .max-w-6xl { max-width: none !important; }
+
+  /* 가로 스크롤 컨테이너 해제: 인쇄 시 내용이 잘리거나 페이지가 과다 분할되는 원인 */
+  .overflow-x-auto, .overflow-auto, .overflow-y-auto { overflow: visible !important; }
+
+  /* 표: 폭 100%, 매 페이지 머리글 반복, 행 중간 분할 금지 */
+  table { width: 100% !important; table-layout: fixed; font-size: 10.5px !important; }
+  thead { display: table-header-group; }
+  tfoot { display: table-footer-group; }
+  tr, td, th { break-inside: avoid; page-break-inside: avoid; }
+  th, td { padding: 3px 5px !important; }
+
+  /* 화면에서 줄인 텍스트는 인쇄물에서 전문을 보여 준다 */
+  .cell-clamp-1, .cell-clamp-2, .cell-clamp-3 { display: block !important; -webkit-line-clamp: unset !important; overflow: visible !important; }
+  .cell-nowrap, .cell-num, .cell-code { white-space: normal !important; overflow: visible !important; text-overflow: clip !important; }
+
+  /* 페이지 나누기 보조 */
+  .print-break-before { break-before: page; page-break-before: always; }
+  .print-avoid-break { break-inside: avoid; page-break-inside: avoid; }
+}
+
+/* 용지: A4 세로가 기본이고 넓은 표는 landscape 지면을 쓴다 (design.md 8절) */
+@page { size: A4 portrait; margin: 10mm; }
+@page landscape { size: A4 landscape; margin: 10mm; }
+
+/* 감사추적 보고서 인쇄 표 (design.md 8절). 요약 5열 + 기록별 상세 블록. 가로 지면은 공용 landscape 지면을 쓴다 */
+.audit-print-preview { width: 100%; overflow-x: auto; }
+.audit-print-area { page: landscape; min-width: 960px; color: #000000; background: #FFFFFF; }
+.audit-print-table { width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 13px; line-height: 1.5; }
+.audit-print-col-timestamp { width: 20%; }
+.audit-print-col-category { width: 10%; }
+.audit-print-col-actor { width: 18%; }
+.audit-print-col-role { width: 12%; }
+.audit-print-col-action { width: 40%; }
+.audit-print-table th, .audit-print-table td { border: 1.5px solid #000000; padding: 6px; vertical-align: top; }
+.audit-print-table th { font-weight: 700; color: #163A5F; background: #F5F7FA; }
+.audit-print-entry + .audit-print-entry > tr:first-child > td { border-top-width: 3px; }
+.audit-print-details-cell { padding: 0 !important; }
+.audit-print-details { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0; }
+.audit-print-target, .audit-print-reason { min-width: 0; padding: 8px; }
+.audit-print-detail { min-width: 0; padding: 6px; }
+.audit-print-detail + .audit-print-detail { border-left: 1.5px solid #000000; }
+.audit-print-detail-label { display: block; margin-bottom: 4px; font-weight: 700; color: #163A5F; }
+.audit-print-detail-label + .audit-print-code, .audit-print-detail-label + .audit-print-text { display: block; }
+.audit-print-empty { padding: 28px !important; text-align: center; color: #667085; }
+.audit-print-code { overflow-wrap: anywhere; word-break: break-word; white-space: pre-wrap; }
+.audit-print-text { overflow-wrap: anywhere; }
+
+@media print {
+  .audit-print-preview { overflow: visible !important; }
+}

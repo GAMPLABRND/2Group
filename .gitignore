@@ -1,0 +1,68 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# env files (can opt-in for committing if needed)
+.env*
+!.env.example
+
+# Google 서비스 계정 JSON 키 — 절대 커밋 금지
+*service-account*.json
+*credentials*.json
+
+# Claude Code 개인 로컬 설정 (팀 공유 설정은 .claude/settings.json)
+.claude/settings.local.json
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# Google 서비스 계정 JSON 키는 이름이 제각각(프로젝트ID-해시.json)이므로 루트의 *.json 을 막고 설정 파일만 허용한다
+/*.json
+!/package.json
+!/package-lock.json
+!/tsconfig.json
+*.key.json
+/keys/
+
+# Word 잠금 파일, 로그, 에디터 설정, 임시 폴더
+~$*
+*.log
+Thumbs.db
+.vscode/
+.idea/
+/tmp/
+
+# FDS 출력 경로 점검용 샘플
+docs/FDS_SAMPLE.docx
