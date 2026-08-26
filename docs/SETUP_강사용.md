@@ -49,7 +49,7 @@ npm.cmd run build
 
 [console.cloud.google.com](https://console.cloud.google.com) → 새 프로젝트 6개
 (`csv-edu-team01` ~ `csv-edu-team06`) → 각 프로젝트에서 **API 및 서비스 → 라이브러리 →
-"Google Sheets API" → 사용 설정**.
+"Google Sheets API"과 "Google Drive API" → 각각 사용 설정**.
 
 프로젝트를 조별로 분리하는 이유는 API 쿼터, 권한, 장애 범위를 조별로 격리하기 위해서다.
 한 프로젝트에 6개 조를 몰아넣으면 동시 실습 중 한 조의 과다 호출이나 권한 문제가 다른 조까지 영향을 줄 수 있다.
@@ -84,7 +84,7 @@ JSON 안의 `client_email`과 `private_key` 두 값을 ⑤에서 쓴다.
 - **뷰어**로 공유하면 읽기는 되고 쓰기(시드, 저장)가 403으로 실패한다. 반드시 편집자.
 - 탭(USERS 등)은 미리 만들 필요 없음. `/api/seed`가 자동 생성한다.
 
-## ⑤ .env.local 작성 (조당 약 3분)
+## ⑤ .env.local 작성 (조당 약 5분)
 
 조별 리포 루트에서 `.env.example`을 복사해 `.env.local` 생성 후 3종 입력:
 
@@ -120,6 +120,7 @@ Vercel 환경 변수 입력 요령:
 - `GOOGLE_PRIVATE_KEY`: JSON의 `private_key` **값 부분만**(감싸는 따옴표 제외) 붙여넣는다.
   `\n` 이스케이프가 포함된 한 줄이든, 실제 줄바꿈이 있는 여러 줄이든 둘 다 동작한다(코드가 두 형태를 모두 처리).
 - 나머지 2종은 값 그대로.
+- 백업 파일은 Google Drive 폴더나 서버에 저장하지 않는다. ADMIN이 백업 화면에서 생성 완료 후 브라우저 다운로드 기능으로 사용자 PC에 수동 저장한다.
 
 **실패 시 점검 포인트**
 - 배포 후 데이터 호출이 500이면: Vercel → 프로젝트 → Settings → Environment Variables 3종 확인 →

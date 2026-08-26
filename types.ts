@@ -1,36 +1,98 @@
-// 공통 타입. 공유 파일이므로 오케스트레이터만 수정한다 (CLAUDE.md 파일 소유권 규칙).
-// 역할 코드, 한글 명칭, 계정은 조가 제공한 URS (§6.1 역할 정의, §7.6 시드 계정) 를 따른다.
-// 아래는 URS 를 읽기 전의 자리표시 기본값이며, STEP 2 에서 URS 값으로 교체한다. 업무 엔티티 타입도 STEP 2 에서 추가한다.
+// URS 기반 공통 타입. 공유 파일은 오케스트레이터만 수정한다.
 
-export const ROLES = ["ADMIN", "USER", "REVIEWER"] as const;
+export const ROLES = ["ADMIN", "TESTER", "APPROVER"] as const;
 export type Role = (typeof ROLES)[number];
 
 export const ROLE_LABELS: Record<Role, string> = {
   ADMIN: "관리자",
-  USER: "작업자",
-  REVIEWER: "검토자",
+  TESTER: "사용자",
+  APPROVER: "검토자",
 };
 
 export type Session = { userId: string; role: Role };
 
-// USERS 탭 (1행 헤더: id, user_id, name, password, role, status, created_at)
 export type UserRow = {
   id: string;
   user_id: string;
   name: string;
+  employee_no: string;
   password: string;
-  role: string;
-  status: string; // ACTIVE | INACTIVE
-  created_at: string; // ISO 저장, 표시는 lib/kst.ts
+  role: Role | string;
+  status: "ACTIVE" | "INACTIVE" | string;
+  permission_overrides: string;
+  password_changed_at: string;
+  password_expires_at: string;
+  failed_login_count: string;
+  locked_at: string;
+  created_at: string;
+  updated_at: string;
 };
 
-// 로그인 화면의 계정 선택 목록에 쓰는 공개 정보 (비밀번호 제외). initial 은 비밀번호가 아직 초기값(1234)인지 여부이며,
-// 초기값인 계정을 고르면 로그인 화면이 비밀번호를 자동으로 채운다 (QA 편의). 비밀번호를 바꾸면 자동 입력이 꺼진다.
 export type AccountOption = { user_id: string; name: string; role: string; initial: boolean };
 
-// AUDIT 탭 (1행 헤더: id, category, actor_id, actor_name, role, action,
-//           target, before_value, after_value, reason, timestamp_kst)
-export type AuditCategory = "SECURITY" | "DATA";
+export const EQUIPMENT_AVAILABILITY = ["AVAILABLE", "SUSPENDED", "RETIRED"] as const;
+export type EquipmentAvailability = (typeof EQUIPMENT_AVAILABILITY)[number];
+export const EQUIPMENT_OCCUPANCY = ["FREE", "OCCUPIED"] as const;
+export type EquipmentOccupancy = (typeof EQUIPMENT_OCCUPANCY)[number];
+
+export type EquipmentRow = {
+  id: string;
+  equipment_code: string;
+  equipment_name: string;
+  location: string;
+  calibration_required: "REQUIRED" | "NOT_REQUIRED" | string;
+  calibration_due_date: string;
+  qualification_required: "REQUIRED" | "NOT_REQUIRED" | string;
+  availability_status: EquipmentAvailability | string;
+  occupancy_status: EquipmentOccupancy | string;
+  occupancy_record_id: string;
+  occupied_by_user_id: string;
+  occupied_by_user_name: string;
+  occupied_at: string;
+  remarks: string;
+  created_by: string;
+  created_at: string;
+  updated_by: string;
+  updated_at: string;
+};
+
+export const USE_RECORD_STATUSES = ["IN_USE", "COMPLETED", "CHANGE_REQUESTED", "REVIEWED", "INVALID"] as const;
+export type UseRecordStatus = (typeof USE_RECORD_STATUSES)[number];
+
+export type UseRecordRow = {
+  id: string;
+  equipment_id: string;
+  equipment_code: string;
+  equipment_name: string;
+  user_id: string;
+  user_name: string;
+  employee_no: string;
+  usage_type: string;
+  usage_purpose: string;
+  reference_no: string;
+  started_at: string;
+  ended_at: string;
+  record_status: UseRecordStatus | string;
+  after_use_status: string;
+  abnormality_details: string;
+  end_method: string;
+  exception_ended_by_id: string;
+  exception_ended_by_name: string;
+  exception_ended_at: string;
+  exception_reason: string;
+  change_request_reason: string;
+  reviewer_id: string;
+  reviewer_name: string;
+  reviewed_at: string;
+  signature_meaning: string;
+  invalidated_by: string;
+  invalidated_at: string;
+  invalidation_reason: string;
+  updated_by: string;
+  updated_at: string;
+};
+
+export type AuditCategory = "SECURITY" | "DATA" | "SYSTEM";
 export type AuditRow = {
   id: string;
   category: string;
@@ -43,4 +105,32 @@ export type AuditRow = {
   after_value: string;
   reason: string;
   timestamp_kst: string;
+};
+
+export type BackupSettings = {
+  id: string;
+  intervalDays: number;
+  executionTime: string;
+  enabled: boolean;
+  timezone: "Asia/Seoul";
+  updatedBy: string;
+  updatedAt: string;
+};
+
+export type BackupRun = {
+  id: string;
+  backupDate: string;
+  startedAt: string;
+  completedAt: string;
+  status: "IN_PROGRESS" | "COMPLETED" | "FAILED";
+  backupScope: string;
+  fileFormat: "XLSX";
+  fileName: string;
+  fileSizeBytes: number;
+  errorMessage: string;
+  driveFileId: string;
+  sha256: string;
+  triggerType: "MANUAL" | "SCHEDULED";
+  triggeredBy: string;
+  scheduleKey: string;
 };

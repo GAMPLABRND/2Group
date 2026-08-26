@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "role": "builder-d1",
+  "status": "complete",
+  "assignment": "PLAN.md D1 ownership for URS-F-001 and URS-F-008 using SPEC_A.md and design.md",
+  "files_created": [
+    "app/admin/_pageAccess.ts",
+    "app/admin/AdminConsole.tsx",
+    "app/admin/page.tsx",
+    "app/api/admin/_utils.ts",
+    "app/api/admin/route.ts",
+    "app/api/admin/training-profile/route.ts",
+    "app/api/equipment/route.ts",
+    "app/api/password/route.ts",
+    "app/equipment/EquipmentConsole.tsx",
+    "app/equipment/page.tsx",
+    "app/password/PasswordForm.tsx",
+    "app/password/page.tsx"
+  ],
+  "files_modified": [
+    "app/api/login/route.ts",
+    "app/api/logout/route.ts",
+    "app/login/LoginForm.tsx",
+    "app/login/page.tsx"
+  ],
+  "clauses_covered": [
+    "URS-F-001",
+    "URS-F-008"
+  ],
+  "clauses_unresolved": [],
+  "shared_change_requests": [],
+  "checks_run": [
+    {
+      "command": "npx.cmd tsc --noEmit",
+      "result": "pass"
+    },
+    {
+      "command": "npm.cmd run lint",
+      "result": "pass"
+    },
+    {
+      "command": "npm.cmd run check:sheets",
+      "result": "pass"
+    },
+    {
+      "command": "npm.cmd run build",
+      "result": "pass"
+    }
+  ],
+  "blocker": null
+}

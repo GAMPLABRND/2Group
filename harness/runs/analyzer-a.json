@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "role": "analyzer-a",
+  "status": "complete",
+  "assignment": "Analyze URS Section 2, all of Section 6, URS-F-001, URS-F-008, URS-D-002, URS-E-002, and URS-E-003 for roles, accounts, permissions, authentication, equipment master data, audit events, and idempotent seed values.",
+  "files_created": [
+    "SPEC_A.md",
+    "harness/runs/analyzer-a.json"
+  ],
+  "files_modified": [],
+  "clauses_covered": [
+    "URS-F-001",
+    "URS-F-008",
+    "URS-D-002",
+    "URS-E-002",
+    "URS-E-003"
+  ],
+  "clauses_unresolved": [],
+  "shared_change_requests": [],
+  "checks_run": [
+    {
+      "command": "git diff --check -- SPEC_A.md",
+      "result": "pass"
+    },
+    {
+      "command": "PowerShell assigned-clause, seed, access-notice, and forbidden-character marker check",
+      "result": "pass"
+    }
+  ],
+  "blocker": null
+}

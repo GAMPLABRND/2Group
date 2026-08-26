@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "role": "builder-d2",
+  "status": "complete",
+  "assignment": "PLAN.md D2 ownership for URS-F-002, URS-F-003 core record and recovery request flow, URS-F-004, URS-F-009, and URS-F-007 record query support",
+  "files_created": [
+    "app/records/page.tsx",
+    "app/records/RecordsClient.tsx",
+    "app/records/new/page.tsx",
+    "app/records/new/NewRecordClient.tsx",
+    "app/records/[recordId]/page.tsx",
+    "app/records/[recordId]/RecordDetailClient.tsx",
+    "app/api/records/_lib/service.ts",
+    "app/api/records/route.ts",
+    "app/api/records/start/route.ts",
+    "app/api/records/[recordId]/route.ts",
+    "app/api/records/[recordId]/end/route.ts",
+    "app/api/records/[recordId]/exception-end/route.ts",
+    "app/api/records/[recordId]/invalidate/route.ts",
+    "app/api/remediations/route.ts",
+    "app/api/resume-requests/route.ts"
+  ],
+  "files_modified": [],
+  "clauses_covered": [
+    "URS-F-002",
+    "URS-F-003",
+    "URS-F-004",
+    "URS-F-007",
+    "URS-F-009"
+  ],
+  "clauses_unresolved": [],
+  "shared_change_requests": [],
+  "checks_run": [
+    {
+      "command": "npx.cmd tsc --noEmit",
+      "result": "pass"
+    },
+    {
+      "command": "npx.cmd eslint app/records app/api/records app/api/remediations app/api/resume-requests",
+      "result": "pass"
+    },
+    {
+      "command": "npm.cmd run build",
+      "result": "pass"
+    },
+    {
+      "command": "git diff --check -- app/records app/api/records app/api/remediations app/api/resume-requests",
+      "result": "pass"
+    },
+    {
+      "command": "npm.cmd run lint",
+      "result": "blocked outside D2 ownership by app/login/page.tsx:47 react-hooks/purity"
+    }
+  ],
+  "blocker": null
+}

@@ -1,5 +1,5 @@
 import { appendRow, ensureTab } from "@/lib/sheets";
-import { nowKST } from "@/lib/kst";
+import { nowISO } from "@/lib/kst";
 import type { AuditCategory } from "@/types";
 
 export const AUDIT_TAB = "AUDIT";
@@ -32,7 +32,7 @@ export type AuditEntry = {
   reason?: string;
 };
 
-/** AUDIT 탭에 1행 append. 감사추적 실패가 본 업무 흐름을 막지 않도록 throw 하지 않는다. */
+/** AUDIT 탭에 1행 append. 탭 생성 재시도 뒤에도 실패하면 변경 API가 성공을 보고하지 않도록 오류를 전달한다. */
 export async function logAudit(e: AuditEntry) {
   const row = {
     id: newId(),
@@ -45,7 +45,7 @@ export async function logAudit(e: AuditEntry) {
     before_value: e.before ?? "",
     after_value: e.after ?? "",
     reason: e.reason ?? "",
-    timestamp_kst: nowKST(true),
+    timestamp_kst: nowISO(),
   };
   try {
     await appendRow(AUDIT_TAB, row);
@@ -55,6 +55,7 @@ export async function logAudit(e: AuditEntry) {
       await appendRow(AUDIT_TAB, row);
     } catch (err) {
       console.error("[audit] 감사추적 기록 실패:", err);
+      throw err;
     }
   }
 }

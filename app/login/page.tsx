@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import { getRows } from "@/lib/sheets";
 import { APP_NAME, APP_SUBTITLE, CI_SRC, FOOTER_NOTICE, INITIAL_PASSWORD, INITIAL_PASSWORD_NOTICE, ORG_NAME } from "@/lib/brand";
+import { nowISO } from "@/lib/kst";
 import type { AccountOption } from "@/types";
 import LoginForm from "./LoginForm";
 
@@ -31,7 +32,24 @@ async function loadAccounts(): Promise<{ accounts: AccountOption[]; error: strin
 
 export default async function LoginPage() {
   const session = await getSession();
-  if (session) redirect("/");
+  if (session) {
+    let account: Record<string, string> | undefined;
+    let accountLookupSucceeded = false;
+    try {
+      const users = await getRows("USERS");
+      account = users.find((row) => row.user_id === session.userId);
+      accountLookupSucceeded = true;
+    } catch {
+      // 연결 오류는 대시보드의 환경 안내에서 처리한다.
+    }
+    if (accountLookupSucceeded && (!account || account.status !== "ACTIVE" || account.locked_at || account.role !== session.role)) {
+      redirect("/api/logout");
+    }
+    if (account?.password_expires_at && new Date(account.password_expires_at).getTime() <= Date.parse(nowISO())) {
+      redirect("/password?expired=1");
+    }
+    redirect("/");
+  }
   const missing = REQUIRED_ENV.filter((k) => !process.env[k]);
   const { accounts, error } = missing.length === 0 ? await loadAccounts() : { accounts: [], error: "" };
 

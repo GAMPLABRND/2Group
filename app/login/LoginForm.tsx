@@ -43,12 +43,12 @@ export default function LoginForm({ accounts }: { accounts: AccountOption[] }) {
         cache: "no-store",
         body: JSON.stringify({ user_id: userId.trim(), password }),
       });
-      const data: { error?: string } = await res.json().catch(() => ({}));
+      const data: { error?: string; password_expired?: boolean } = await res.json().catch(() => ({}));
       if (!res.ok) {
         setError(data.error ?? `로그인 실패 (HTTP ${res.status})`);
         return;
       }
-      router.push("/");
+      router.push(data.password_expired ? "/password?expired=1" : "/");
       router.refresh();
     } catch (err) {
       setError(`요청 실패: ${err instanceof Error ? err.message : String(err)}`);

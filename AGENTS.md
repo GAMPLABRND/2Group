@@ -117,3 +117,13 @@
 ## 11. 최종 보고
 
 최종 보고에는 실행 방법과 계정표, URS 기능 조항 총수와 상태 집계, 생성한 시트 탭, 구현 범위, 남은 범위와 사유, 하네스 게이트 결과, 실제 환경 검증 여부, 산출물 경로, 다음 사람의 작업을 포함한다. 구현한 조항을 채팅에 전부 나열하지 않고 `IMPLEMENTED.md`와 추적성 문서를 가리킨다.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

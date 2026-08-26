@@ -141,6 +141,23 @@ export function TextInput(props: InputHTMLAttributes<HTMLInputElement>) {
   return <input {...props} className={`${INPUT_CLASS} ${props.className ?? ""}`} />;
 }
 
+export function Checkbox({
+  label,
+  className = "",
+  ...props
+}: Omit<InputHTMLAttributes<HTMLInputElement>, "type"> & { label: string }) {
+  return (
+    <label className={`flex cursor-pointer items-center gap-2 rounded-input border border-line bg-white px-3.5 py-2.5 text-sm font-semibold text-ink ${className}`}>
+      <input
+        {...props}
+        type="checkbox"
+        className="h-4 w-4 shrink-0 accent-primary focus:ring-2 focus:ring-primary/20"
+      />
+      <span>{label}</span>
+    </label>
+  );
+}
+
 export function Select(props: SelectHTMLAttributes<HTMLSelectElement>) {
   return <select {...props} className={`${INPUT_CLASS} ${props.className ?? ""}`} />;
 }

@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "role": "builder-d4",
+  "status": "complete",
+  "assignment": "PLAN.md D4 ownership for URS-F-005 and URS-F-010 plus SPEC_C supplemental support, integrated with the shared fail-closed audit helper",
+  "files_created": [
+    "app/audit/AuditActions.tsx",
+    "app/audit/AuditTable.tsx",
+    "app/audit/page.tsx",
+    "app/audit/print/page.tsx",
+    "app/alarms/HistoryDetail.tsx",
+    "app/alarms/page.tsx",
+    "app/api/audit/query.ts",
+    "app/api/audit/route.ts",
+    "app/api/audit/export/route.ts",
+    "app/api/audit/print/route.ts",
+    "app/api/alarms/data.ts",
+    "app/api/alarms/route.ts",
+    "app/api/dashboard/data.ts",
+    "app/api/dashboard/route.ts",
+    "app/api/backup/route.ts",
+    "harness/runs/builder-d4.json"
+  ],
+  "files_modified": [
+    "app/page.tsx",
+    "app/api/seed/route.ts",
+    "README.md"
+  ],
+  "clauses_covered": [
+    "URS-F-005",
+    "URS-F-010",
+    "URS-D-001",
+    "URS-D-002",
+    "URS-D-003",
+    "URS-T-001",
+    "URS-T-002",
+    "URS-T-003",
+    "URS-I-001",
+    "URS-N-001",
+    "URS-N-002",
+    "URS-E-001",
+    "URS-E-002",
+    "URS-E-003",
+    "URS-C-001",
+    "URS-L-001",
+    "URS-L-002"
+  ],
+  "clauses_unresolved": [],
+  "shared_change_requests": [],
+  "checks_run": [
+    {
+      "command": "npx.cmd tsc --noEmit",
+      "result": "pass"
+    },
+    {
+      "command": "npm.cmd run lint",
+      "result": "pass"
+    },
+    {
+      "command": "npm.cmd run check:sheets",
+      "result": "pass"
+    },
+    {
+      "command": "npm.cmd run build",
+      "result": "pass"
+    },
+    {
+      "command": "git diff --check -- README.md app/page.tsx app/audit app/alarms app/api/audit app/api/alarms app/api/dashboard app/api/seed app/api/backup",
+      "result": "pass"
+    }
+  ],
+  "blocker": null
+}

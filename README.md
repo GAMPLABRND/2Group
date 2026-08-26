@@ -1,135 +1,97 @@
-# GMP MVP 하네스 템플릿 v3, Codex 전용
+# CSV실습과정 2조 전자로그북
 
-KPBMA-EDU-001-URS를 기준으로 Next.js, TypeScript, Tailwind, Google Sheets, Vercel 기반 교육용 GMP MVP를 만드는 Codex 전용 템플릿입니다. `05 Harness-codex v2`의 앱, 디자인, FDS, CSV 실습 흐름을 보존하면서 Codex가 실제로 읽고 재개하고 검증할 수 있는 구조로 재설계하였습니다.
+본 애플리케이션은 KPBMA 교육용 URS를 기준으로 구현한 전자로그북 MVP이다. Next.js App Router, TypeScript, Tailwind, Google Sheets, Vercel 구조를 사용한다. 실데이터를 입력하지 않으며 실제 GMP 운영 시스템으로 사용하지 않는다.
 
-v3의 핵심 변화는 다음과 같습니다.
+버전은 `3.0.0`이다.
 
-- Codex가 자동으로 읽는 루트 `AGENTS.md`를 짧은 실행 계약으로 만들고 상세 절차를 `harness/` 플레이북으로 분리하였습니다.
-- 분석 3역할과 구현 4역할은 유지하되 사용 가능한 동시 슬롯에 맞춰 실행 웨이브를 조정합니다.
-- 7개 역할을 프로젝트 범위 `.codex/agents/*.toml` 사용자 정의 에이전트로 등록했습니다. `agent:prompt`는 이를 선택할 수 없는 클라이언트의 폴백입니다.
-- 실행 재현성을 위해 오케스트레이터와 Builder는 Sol/high, Analyzer는 Terra/xhigh로 고정했습니다. 이름 없는 보조 작업만 Terra/low를 사용하며 Luna는 사용하지 않습니다.
-- URS 전 조항을 `harness/state/URS_STATUS.json`으로 관리하고 조항별 파일, 화면 또는 API, 실행 증거가 없으면 완료로 판정하지 않습니다.
-- 중앙 상태와 파생 문서에 동일한 상태 지문을 사용하여 동기화되지 않은 IMPLEMENTED, 추적성, 증거, gaps 문서를 차단합니다.
-- 빌드 완료와 실제 Google Sheets 또는 배포 환경 검증을 분리하여 보고합니다.
-- 현재 Codex CLI에서 지원하지 않는 `--full-auto` 예시를 제거하였습니다.
+## 로컬 실행
 
-기존 의도의 위치별 보존 결과는 [V3_REDESIGN.md](docs/V3_REDESIGN.md)에서 확인할 수 있습니다.
-
-## 가장 쉬운 시작
-
-1. Codex 앱에서 이 폴더를 작업 폴더로 엽니다.
-2. 조별 URS `.docx`를 `docs/urs/`에 넣습니다.
-3. 다음 한 문장을 입력합니다.
-
-   ```text
-   하네스 절차대로 URS MVP 빌드를 시작해.
-   ```
-
-Codex는 루트 `AGENTS.md`를 자동으로 읽고 URS 변환, 조항 인벤토리, 분석, 설계, 구현, 하네스 감사, 빌드와 가능한 환경 스모크까지 진행합니다. 멀티에이전트를 사용할 수 없는 환경에서도 같은 7역할을 순차 수행합니다.
-
-프로젝트 설정은 `.codex/config.toml`과 `.codex/agents/*.toml`에 고정되어 있습니다. 교육 전날 해당 Codex 계정에서 `gpt-5.6-sol`, `gpt-5.6-terra`, Terra의 `xhigh` 추론 수준을 사용할 수 있는지 확인합니다. 모델 접근이 없으면 설정이 자동으로 다른 모델로 안전하게 대체된다고 가정하지 않습니다.
-
-현재 CLI에서 직접 열 때는 다음처럼 작업 폴더, sandbox, 승인 정책을 명시할 수 있습니다.
-
-```powershell
-codex -C . -s workspace-write -a never
-```
-
-외부 Google Sheets 연결이 sandbox에서 막히면 위험한 우회 옵션을 사용하지 않고 환경 검증 대기로 기록합니다. 의존성은 교육 전날 설치해 둡니다.
-
-## 시스템과 구현 기준
-
-하나의 하네스로 다음 3종을 만듭니다.
-
-- 장비사용기록서, 전자로그북
-- 세척밸리데이션 관리
-- 실험실 재고관리, 시약과 표준품
-
-시스템명, 업무 엔티티, 역할, 계정, 화면, 상태, 차단 규칙은 URS가 결정합니다. 구현 정본은 Section 2, Section 6, Section 7.1이며 Section 7.2부터 7.8은 보조 기준입니다.
-
-고정 운영 원칙:
-
-- 첫 빌드 비밀번호는 모두 `1234`이며 배포 전에 변경합니다.
-- 로그인은 계정 선택, 아이디, 비밀번호 순서입니다.
-- 제목은 `CSV실습과정 [조번호]조 [시스템명]` 형식입니다.
-- 모든 7.1 조항이 구현 대상입니다.
-- AI는 push와 Vercel 배포를 하지 않습니다.
-- IOQ는 사람이 실제 배포 URL의 고정 `v1.0`을 시험합니다.
-
-## 실행 모드
-
-| 모드 | 트리거 예시 | 결과 |
-|---|---|---|
-| 원샷 빌드 | `하네스 절차대로 URS MVP 빌드를 시작해.` | 앱, SPEC, PLAN, 조항 상태, 추적성, 증거, gaps |
-| QA 수정 | `수정 요청: 출고 화면에서 기한 경과품이 저장돼.` | 결함 재현, 최소 수정, 관련 조항과 CHANGELOG 갱신 |
-| FDS | `FDS를 작성해줘.` | as-built `docs/FDS.md`, 검증된 Word DOCX |
-| CSV 문서 | `IOQ 시나리오 초안을 만들어줘.` | DQ, IOQ, RTM 초안 지원 |
-| 릴리스 준비 | `커밋 준비해.` | 비밀 점검, 최종 게이트, build, 커밋과 태그 준비 |
-
-## 주요 명령
+Node.js 22 이상과 인터넷에 연결된 교육장 PC가 필요하다. 현재 Chrome 계열 브라우저를 기본 지원하며 인쇄는 Chrome과 Edge에서 확인한다. 배포 환경에서는 교육생이 접근할 수 있는 HTTPS URL이 필요하다. Firefox 인쇄는 용지 방향 차이가 있으므로 필수 출력 검증에 사용하지 않는다. [URS-E-001, URS-T-001, URS-T-003]
 
 ```powershell
 npm.cmd install
-npm.cmd run harness:init
-npm.cmd run agent:prompt -- --role analyzer-a --assignment "담당 소절: 7.1.1, 7.1.4"
-npm.cmd run harness:sync
-npm.cmd run check:harness
-npm.cmd run test:harness
-npm.cmd run test:harness:gate
-npm.cmd run check:harness -- --final
-npm.cmd run check:sheets
-npm.cmd run check:commit
-npm.cmd run fds -- --sample
-npm.cmd run build
+Copy-Item .env.example .env.local
 npm.cmd run dev
 ```
 
-`check:harness`는 URS가 없는 템플릿 상태에서는 구조와 의도 보존을 점검합니다. `--final`은 URS 상태, 7개 역할 완료 파일, SPEC, PLAN, 구현 파일, 조항별 증거와 파생 문서를 모두 확인합니다.
+브라우저에서 `http://localhost:3000/api/seed`를 한 번 호출한 뒤 `http://localhost:3000/login`에서 계정을 선택하여 로그인한다. 최초 시드는 세션 없이 실행할 수 있고, 계정이 생성된 뒤 재실행은 ADMIN 로그인 세션이 필요하다. 시드는 없는 탭과 행만 추가하며 기존 값, 상태, 비밀번호를 덮어쓰거나 행을 삭제하지 않는다. 같은 시드를 다시 실행하면 생성 건수는 0건이며 중복 행과 중복 시드 감사추적을 만들지 않는다. [URS-E-002, URS-E-003, URS-F-009]
 
-`test:harness`는 URS ID 파서와 URS 변경 시 증거 초기화를 확인합니다. `test:harness:gate`는 누락 산출물과 오래된 파생 문서를 실제로 차단하고, 완전한 fixture만 `COMPLETE_WITH_ENV_VALIDATION_REQUIRED`로 통과시키는 end-to-end 자가시험입니다.
+초기 비밀번호는 모든 교육 계정에 `1234`를 사용한다. 배포 전에 각 계정으로 로그인하여 비밀번호 변경 화면에서 변경한다.
 
-## 폴더 구성
+| 계정 ID | 표시명 | 역할 코드 | 역할명 |
+|---|---|---|---|
+| `admin` | 관리자 (EDU2-001) | `ADMIN` | 관리자 |
+| `user` | 사용자 (EDU2-002) | `TESTER` | 사용자 |
+| `reviewer` | 검토자 (EDU2-003) | `APPROVER` | 검토자 |
 
-| 경로 | 역할 |
+## Google Sheets 설정
+
+다음 환경 변수를 로컬 `.env.local`과 Vercel 프로젝트 설정에 등록한다. 값은 문서, 화면, 로그와 저장소에 기록하지 않는다.
+
+| 환경 변수 | 용도 |
 |---|---|
-| `AGENTS.md` | Codex가 자동으로 읽는 실행 계약과 불변 규칙 |
-| `.codex/config.toml`, `.codex/agents/` | 역할별 모델, 추론 강도, 동시 실행 설정과 7개 사용자 정의 역할 |
-| `harness/WORKFLOW.md` | 원샷, QA, FDS, 릴리스 상세 절차 |
-| `harness/ORCHESTRATION.md` | 슬롯 인식형 분석 3역할, 구현 4역할 실행 |
-| `harness/QUALITY_GATES.md` | 템플릿, 조항, 코드, 환경, 릴리스 게이트 |
-| `harness/OUTPUT_CONTRACTS.md` | 상태 JSON과 산출물 형식 |
-| `harness/state/` | URS 상태와 현재 단계 정본 |
-| `harness/runs/` | 역할별 완료 원장 |
-| `agents/` | analyzer-a/b/c, builder-d1/d2/d3/d4 역할 전문 |
-| `scripts/harness-init.mjs` | URS ID 인벤토리와 초기 상태 생성 |
-| `scripts/sync-harness-report.mjs` | IMPLEMENTED, 추적성, 증거, gaps 생성 |
-| `scripts/check-harness.mjs` | 의도 보존과 최종 완료 감사 |
-| `scripts/test-harness-parser.mjs` | URS ID 인벤토리, 표 정본 우선순위와 역할 배정 자가시험 |
-| `scripts/test-harness-gate.mjs` | 누락 상태의 fail-closed와 완전한 fixture의 최종 게이트 자가시험 |
-| `scripts/render-agent-prompt.mjs` | 사용자 정의 역할을 선택할 수 없을 때 쓰는 완전한 폴백 프롬프트 생성 |
-| `design.md`, `components/ui.tsx` | KPBMA CI 디자인과 표 overflow 안전망 |
-| `docs/FDS_*`, `scripts/build-fds.mjs` | as-built FDS 검증과 Word 생성 |
-| `docs/SETUP_강사용.md`, `docs/RUNBOOK_당일운영.md` | 조별 환경 준비와 교육 당일 운영 |
+| `GOOGLE_SERVICE_ACCOUNT_EMAIL` | Google Cloud 서비스 계정 이메일 |
+| `GOOGLE_PRIVATE_KEY` | 서비스 계정 개인키 |
+| `GOOGLE_SHEET_ID` | 운영 데이터 스프레드시트 ID |
 
-## 조별 프로젝트 복제
+Google Sheets API와 Google Drive API를 활성화하고 운영 시트를 `GOOGLE_SERVICE_ACCOUNT_EMAIL` 계정에 편집자로 공유한다. Drive API는 운영 Google Spreadsheet를 XLSX로 내보내는 데만 사용하며 시스템 내 Google Drive 경로에 백업 파일을 생성하지 않는다. 브라우저에는 서비스 계정 정보, 시트 ID와 토큰을 전달하지 않는다. [URS-T-002, URS-I-001, URS-C-001, URS 개정 대상]
 
-템플릿 옆에 새 폴더를 만들 때 다음 명령을 사용합니다.
+시드가 생성하는 탭은 다음과 같다. 열 정본은 `lib/schema.ts`이며 기존 탭의 열 이름을 변경하거나 삭제하지 않는다.
 
-```powershell
-npm.cmd run new -- team01
-Set-Location ..\team01
-npm.cmd install
-Copy-Item .env.example .env.local
+| 탭 | 저장 내용 |
+|---|---|
+| `USERS` | 계정, 역할, 상태, 로그인 보안 정보 |
+| `SECURITY_SETTINGS` | 비밀번호, 잠금, 자동 로그아웃 설정 |
+| `TRAINING_PROFILE` | 가변 실습자와 소속 회사 배열, 조 정보, 최종 수정 정보 |
+| `TRAINING_HISTORY` | 사용자별 교육 완료 이력 |
+| `EQUIPMENT` | 장비 기준정보, 독립된 교정 및 적격성평가 대상 여부, 교정 유효기간, 사용과 점유 상태 |
+| `USE_RECORDS` | 장비 사용 시작, 종료, 검토, 무효 이력 |
+| `EQUIPMENT_REMEDIATIONS` | 이상 발생 조치 이력 |
+| `EQUIPMENT_RESUME_REQUESTS` | 사용 재개 요청, 제2자 확인, 승인과 반려 이력 |
+| `BACKUP_SETTINGS` | 이전 자동 백업 설정과 비활성 상태를 보존하는 호환 이력 |
+| `BACKUP_RUNS` | 백업 시작과 완료, 파일 메타데이터, SHA-256 해시와 오류 이력 |
+| `BACKUP_ALARMS` | ADMIN 전용 백업 완료 및 실패 알람 |
+| `ALARM_ACKS` | 사용자별 미확인 알람 확인 시각, 유형과 대상 |
+| `AUDIT` | 보안, 데이터, 시스템 감사추적 |
+
+`/api/seed`는 교육 계정, 비밀번호와 잠금 기본값, 한국제약바이오협회 소속 기본 실습자 6명과 2조 교육 정보, 교육 완료 이력, 장비 3건을 멱등 방식으로 생성한다. 장비 시드에는 정상 흐름용 장비와 교정 만료 차단 및 알람 시험용 장비가 포함된다. 응답이나 감사추적에는 비밀번호 값을 기록하지 않는다. [URS-E-002, URS-E-003, URS-L-002, URS 개정 대상]
+
+교정 대상 장비의 교정 유효기간이 KST 현재 날짜보다 과거가 되면 시스템은 해당 장비를 `사용중지`로 자동 전환하고 SYSTEM 감사추적을 기록한다. 기준정보, 사용 시작, 대시보드와 알람은 같은 판정 결과를 사용하며 사용 시작 API는 교정 만료 사유로 요청을 차단한다. [URS-F-001, URS-F-002, URS-F-005, URS 개정 대상]
+
+로그인 화면 이후 상단 사용자 식별은 `아이디 (사번)` 형식으로 표시한다. 대시보드는 장비 코드, 장비명, 위치, 사용가능 상태와 현재 사용 상태를 직접 조회할 수 있는 기준정보 표를 제공한다. 장비 사용 통계의 이상율은 사용 유형별 `(이상 발생 횟수 / 장비 사용 횟수) * 100`으로 계산하고 사용 횟수가 0건이면 `0%`로 표시한다. [URS-F-005, URS-F-008, URS 개정 대상]
+
+미확인 알람은 로그인 후 서버 API에서 한 번 조회하며 자동 폴링하지 않는다. 팝업은 알람 발생 일시, 구분, 대상 장비 또는 사용자, 주요 내용을 표시하고 `확인(읽음)` 또는 읽음 처리 후 상세 화면 이동을 지원한다. 읽음 이력은 `ALARM_ACKS`에 사용자별로 저장되고 확인 행위는 감사추적에 기록된다. 일반 역할에는 백업, 계정 잠금과 권한 없는 접근 반복 같은 ADMIN 전용 알람을 반환하지 않는다. [URS-F-005, URS-F-010, URS 개정 대상]
+
+## 브라우저 백업과 복구 확인
+
+ADMIN은 `/backup`에서 실행 사유를 입력하고 `백업 완료 후 다운로드`를 선택한다. 서버는 운영 Google Spreadsheet 전체를 메모리에서 `.xlsx`로 생성하고 이력과 SHA-256을 기록한 뒤 같은 응답으로 파일을 반환한다. 클라이언트는 응답을 Blob으로 변환하여 브라우저 다운로드 기능을 호출하므로 사용자가 PC의 저장 위치를 직접 선택하거나 브라우저 기본 다운로드 폴더에 저장한다. [URS-D-003, URS 개정 대상]
+
+첫 파일은 `Back-Up YYYY-MM-DD.xlsx`, 같은 날짜의 추가 파일은 `Back-up YYYY-MM-DD_HH-mm-ss.xlsx`로 생성한다. `BACKUP_RUNS`에는 파일명, 크기, SHA-256, 시작과 완료 시각, 실행자와 결과만 기록하며 XLSX 본문과 PC 저장 경로는 저장하지 않는다. 완료 및 실패 알람은 ADMIN에게만 제공한다. 과거 이력은 파일 저장소가 아니므로 다시 다운로드할 수 없고 새 백업을 생성해야 한다. [URS-D-003, URS-L-001, URS 개정 대상]
+
+백업 파일 생성과 다운로드는 다음 요청 하나로 처리한다.
+
+```text
+POST /api/backup
 ```
 
-복제 스크립트는 `node_modules`, `.git`, `.env.local`, 조별 URS, 이전 상태, 역할 실행 원장, 생성된 추적성 문서를 복사하지 않습니다.
+백업 실행 시작, 생성 완료, 실패, 목록 조회와 다운로드 제공은 감사추적에 기록한다. 자동 스케줄러와 과거 Drive 파일 다운로드 경로는 `410 Gone`으로 차단한다. 실제 배포 전에는 ADMIN 역할 차단, 브라우저 다운로드, 생성된 XLSX 열기와 복구 가능성을 사람이 확인하며 확인 전 상태는 `environment_pending`이다.
 
-## 보안과 검증 경계
+## Vercel 배포 절차
 
-- `.env.local`, 서비스 계정 JSON, 개인키, 토큰을 커밋하지 않습니다.
-- 교육용 평문 비밀번호를 사용하므로 실데이터를 넣지 않습니다.
-- Google Sheets 저장과 동기화는 실제 seed, 로그인, 저장, 재조회, 감사추적 흐름으로 확인합니다.
-- 환경이 없으면 코드와 정적 증거를 완료한 뒤 `COMPLETE_WITH_ENV_VALIDATION_REQUIRED`로 구분합니다.
-- FDS DOCX의 구조 검증과 실제 Word 시각 검증을 같은 것으로 보고하지 않습니다.
+1. 사람이 저장소를 원격 저장소에 push하고 Vercel 프로젝트를 연결한다.
+2. Vercel Settings의 Environment Variables에 Google Sheets 3종을 등록한다.
+3. 운영 시트에 서비스 계정의 필요한 권한을 부여한다.
+4. 최초 배포 URL에서 `/api/seed`, 계정 선택 로그인, 저장, 수동 새로고침 재조회, 역할별 접근, 감사추적, CSV와 인쇄를 확인한다.
+5. ADMIN 백업 화면에서 XLSX를 생성하고 브라우저 다운로드, 파일 열기와 복구 시험을 수행한다.
 
-자세한 첫 실행은 [CODEX_START_여기서.md](docs/CODEX_START_여기서.md)를 확인합니다.
+AI는 `git push`와 Vercel 배포를 실행하지 않는다. 실제 URL, Google Sheets 공유 권한, 브라우저 다운로드, Chrome과 Edge 인쇄, 화면 전환 5초 이내 목표는 배포 환경에서 사람이 검증한다. [URS-N-002, URS-T-003]
+
+## 품질 확인
+
+```powershell
+npm.cmd run check:sheets
+npm.cmd run lint
+npm.cmd run build
+```
+
+Google Sheets나 배포 환경을 사용할 수 없으면 코드 구현과 정적 검사를 계속하고 실제 시드, 저장, 재조회, 브라우저 백업, 복구 읽기, 브라우저 성능과 인쇄 검증은 별도의 `environment_pending` 증거로 관리한다. 네트워크, Google Sheets API 가용성, 서비스 계정 공유와 Vercel URL은 애플리케이션 외부 의존성이다. 연결 실패 시 성공을 보고하지 않으며 사용자가 다시 시도할 수 있는 식별 가능한 한국어 오류를 반환한다. [URS-I-001, URS-N-001, URS-C-001]

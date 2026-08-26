@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "role": "analyzer-b",
+  "status": "complete",
+  "assignment": "Analyze URS Section 6.2 and functional clauses URS-F-002, URS-F-003, URS-F-004, URS-F-005, URS-F-006, and URS-F-007; produce implementation-ready equipment-use, recovery, dashboard, review, electronic-signature, query, and logbook specification.",
+  "files_created": [
+    "SPEC_B.md",
+    "harness/runs/analyzer-b.json"
+  ],
+  "files_modified": [],
+  "clauses_covered": [
+    "URS-F-002",
+    "URS-F-003",
+    "URS-F-004",
+    "URS-F-005",
+    "URS-F-006",
+    "URS-F-007"
+  ],
+  "clauses_unresolved": [],
+  "shared_change_requests": [],
+  "checks_run": [
+    {
+      "command": "git diff --check -- SPEC_B.md",
+      "result": "pass"
+    },
+    {
+      "command": "rg -n \"URS-F-00[2-7]|URS-F-009|URS-E-002|URS-E-003|URS-I-001|URS-D-001|URS-T-002|URS-N-001|—|•\" SPEC_B.md",
+      "result": "pass; assigned clauses and related references present, prohibited decorative characters absent"
+    }
+  ],
+  "blocker": null
+}

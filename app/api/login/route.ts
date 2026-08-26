@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server";
-import { getRows } from "@/lib/sheets";
+import { getRows, updateRowById } from "@/lib/sheets";
 import { createSession } from "@/lib/auth";
 import { logAudit } from "@/lib/audit";
-import type { Role } from "@/types";
+import { nowISO } from "@/lib/kst";
+import { ROLES, type Role } from "@/types";
+import { readSecuritySettings, toUserRow } from "@/app/api/admin/_utils";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -41,34 +43,109 @@ export async function POST(req: Request) {
 
   try {
     const users = await getRows("USERS");
-    const user = users.find((u) => u.user_id === userId);
-    // 교육용 MVP 단순화 치환: 비밀번호 평문 비교 (CLAUDE.md MVP 범위 규칙)
-    const ok = user && user.password === password && (!user.status || user.status === "ACTIVE");
+    const rawUser = users.find((u) => u.user_id === userId);
+    const user = rawUser ? toUserRow(rawUser) : null;
+    const settings = await readSecuritySettings();
 
-    if (!ok) {
+    if (!user) {
       await logAudit({
         category: "SECURITY",
         actor: { id: userId },
-        action: "LOGIN_FAIL",
-        reason: !user
-          ? "존재하지 않는 계정"
-          : user.password !== password
-            ? "비밀번호 불일치"
-            : "비활성 계정",
+        action: "SECURITY.LOGIN_FAILURE",
+        reason: "존재하지 않는 계정",
       });
+      return NextResponse.json({ error: "아이디 또는 비밀번호가 올바르지 않습니다." }, { status: 401 });
+    }
+
+    if (user.status !== "ACTIVE") {
+      await logAudit({
+        category: "SECURITY",
+        actor: { id: user.user_id, name: user.name, role: user.role },
+        action: "SECURITY.LOGIN_FAILURE",
+        target: user.id,
+        reason: "비활성 계정",
+      });
+      return NextResponse.json({ error: "비활성 계정은 로그인할 수 없습니다." }, { status: 403 });
+    }
+
+    if (user.locked_at) {
+      await logAudit({
+        category: "SECURITY",
+        actor: { id: user.user_id, name: user.name, role: user.role },
+        action: "SECURITY.LOGIN_FAILURE",
+        target: user.id,
+        reason: "잠금 계정",
+      });
+      return NextResponse.json({ error: "잠긴 계정입니다. 관리자에게 잠금 해제를 요청하세요." }, { status: 423 });
+    }
+
+    // 교육용 MVP 단순화 범위에 따라 서버에서 평문 비밀번호를 비교한다.
+    if (user.password !== password) {
+      const failedCount = Math.max(0, Number(user.failed_login_count) || 0) + 1;
+      const lockedAt = failedCount >= settings.max_failed_login_attempts ? nowISO() : "";
+      await updateRowById("USERS", user.id, {
+        failed_login_count: failedCount,
+        locked_at: lockedAt,
+        updated_at: nowISO(),
+      });
+      await logAudit({
+        category: "SECURITY",
+        actor: { id: user.user_id, name: user.name, role: user.role },
+        action: "SECURITY.LOGIN_FAILURE",
+        target: user.id,
+        after: JSON.stringify({ failed_login_count: failedCount }),
+        reason: "비밀번호 불일치",
+      });
+      if (lockedAt) {
+        await logAudit({
+          category: "SECURITY",
+          actor: { id: user.user_id, name: user.name, role: user.role },
+          action: "SECURITY.ACCOUNT_LOCKED",
+          target: user.id,
+          after: JSON.stringify({ threshold: settings.max_failed_login_attempts, failed_login_count: failedCount }),
+          reason: "연속 로그인 실패 잠금 기준 도달",
+        });
+      }
       return NextResponse.json(
-        { error: "아이디 또는 비밀번호가 올바르지 않거나 비활성 계정입니다." },
-        { status: 401 }
+        {
+          error: lockedAt
+            ? "로그인 실패 횟수가 잠금 기준에 도달하여 계정이 잠겼습니다."
+            : `아이디 또는 비밀번호가 올바르지 않습니다. 연속 실패 ${failedCount}회입니다.`,
+        },
+        { status: lockedAt ? 423 : 401 },
       );
     }
 
-    await createSession(user.user_id, user.role as Role);
+    if (!(ROLES as readonly string[]).includes(user.role)) {
+      await logAudit({
+        category: "SECURITY",
+        actor: { id: user.user_id, name: user.name, role: user.role },
+        action: "SECURITY.LOGIN_FAILURE",
+        target: user.id,
+        reason: "허용되지 않은 역할 코드",
+      });
+      return NextResponse.json({ error: "계정 역할 설정을 확인하세요." }, { status: 403 });
+    }
+
+    const loginAt = nowISO();
+    if (Number(user.failed_login_count) !== 0) {
+      await updateRowById("USERS", user.id, { failed_login_count: 0, updated_at: loginAt });
+    }
+    await createSession(user.user_id, user.role as Role, settings.idle_timeout_minutes * 60);
     await logAudit({
       category: "SECURITY",
       actor: { id: user.user_id, name: user.name, role: user.role },
-      action: "LOGIN_SUCCESS",
+      action: "SECURITY.LOGIN_SUCCESS",
+      target: user.id,
     });
-    return NextResponse.json({ ok: true, user_id: user.user_id, name: user.name, role: user.role });
+    const passwordExpired = Boolean(user.password_expires_at) && new Date(user.password_expires_at).getTime() <= Date.now();
+    return NextResponse.json({
+      ok: true,
+      user_id: user.user_id,
+      name: user.name,
+      role: user.role,
+      password_expired: passwordExpired,
+    });
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     return NextResponse.json(

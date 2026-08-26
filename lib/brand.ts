@@ -5,8 +5,8 @@
 
 export const ORG_NAME = "한국제약바이오협회";
 export const COURSE_NAME = "CSV실습과정";        // 고정 접두어
-export const TEAM_NO = "1";                       // 조 번호 (URS 표지의 "N조". URS 에 없으면 조별 폴더명 team0N 의 N, 그것도 없으면 1 로 두고 DECISIONS.md 에 기록)
-export const SYSTEM_NAME = "GMP 교육 시스템";     // URS 의 시스템명 (예: 전자로그북, 세척밸리데이션 관리, 실험실 재고관리). 자리표시 기본값
+export const TEAM_NO = "2";
+export const SYSTEM_NAME = "전자로그북";
 export const APP_NAME = `${COURSE_NAME} ${TEAM_NO}조 ${SYSTEM_NAME}`;
 export const APP_SUBTITLE = "AI 바이브코딩 기반 데이터 완전성 및 CSV 실습";
 export const CI_SRC = "/kpbma-ci.png";            // 파란 원본 (흰 바탕, 로그인 화면, 인쇄물)

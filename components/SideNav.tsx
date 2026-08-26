@@ -6,7 +6,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-export type MenuItem = { href: string; label: string; group?: string };
+export type MenuItem = { href: string; label: string; group?: string; disabled?: boolean };
 
 export default function SideNav({ menus }: { menus: MenuItem[] }) {
   const pathname = usePathname();
@@ -27,6 +27,18 @@ export default function SideNav({ menus }: { menus: MenuItem[] }) {
           ) : null}
           {items.map((m) => {
             const active = m.href === "/" ? pathname === "/" : pathname.startsWith(m.href);
+            if (m.disabled) {
+              return (
+                <span
+                  key={m.href}
+                  aria-disabled="true"
+                  title="이 역할은 해당 기능을 사용할 수 없습니다."
+                  className="flex cursor-not-allowed items-center gap-2.5 border-l-4 border-transparent px-6 py-2.5 text-[14px] font-medium text-ink-muted opacity-55"
+                >
+                  {m.label}
+                </span>
+              );
+            }
             return (
               <Link
                 key={m.href}

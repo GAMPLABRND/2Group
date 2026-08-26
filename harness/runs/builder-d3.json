@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "role": "builder-d3",
+  "status": "complete",
+  "assignment": "PLAN.md D3 ownership for URS-F-003, URS-F-006, and URS-F-007 using SPEC_B.md and design.md",
+  "files_created": [
+    "app/approvals/page.tsx",
+    "app/approvals/ApprovalsClient.tsx",
+    "app/print/logbook/page.tsx",
+    "app/print/logbook/LogbookClient.tsx",
+    "app/api/approvals/_shared.ts",
+    "app/api/approvals/route.ts",
+    "app/api/approvals/records/[record_id]/change-request/route.ts",
+    "app/api/approvals/records/[record_id]/review-signature/route.ts",
+    "app/api/approvals/resume-requests/[request_id]/decision/route.ts",
+    "app/api/print/_shared.ts",
+    "app/api/print/equipment/route.ts",
+    "app/api/print/logbook/route.ts",
+    "app/api/print/logbook/audit/route.ts"
+  ],
+  "files_modified": [],
+  "clauses_covered": [
+    "URS-F-003",
+    "URS-F-006",
+    "URS-F-007"
+  ],
+  "clauses_unresolved": [],
+  "shared_change_requests": [],
+  "checks_run": [
+    {
+      "command": "npm.cmd run lint -- app/approvals app/print app/api/approvals app/api/print",
+      "result": "pass"
+    },
+    {
+      "command": "npx.cmd tsc --noEmit",
+      "result": "pass"
+    },
+    {
+      "command": "npm.cmd run build",
+      "result": "pass"
+    },
+    {
+      "command": "git diff --check -- app/approvals app/print app/api/approvals app/api/print",
+      "result": "pass"
+    }
+  ],
+  "blocker": null
+}
